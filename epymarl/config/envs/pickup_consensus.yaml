@@ -1,0 +1,23 @@
+# Pickup Consensus -- the paper configuration (mac/presets.py).
+# env_args are generated from mac.PAPER; keep the two in step.
+env: "gymma"
+common_reward: True
+reward_scalarisation: "sum"
+env_args:
+  key: "pickup-consensus-v0"
+  pretrained_wrapper: null
+  n_agents: 5
+  k_min: 2
+  k_max: 4
+  n_max: 5
+  time_limit: 10
+
+# PPO-family baselines (mappo/commnet/tarmac) evaluate by sampling: the
+# soft_policies selector ignores test_greedy. QMIX evaluates greedily.
+test_greedy: True
+test_nepisode: 100
+test_interval: 20000
+log_interval: 20000
+runner_log_interval: 10000
+learner_log_interval: 10000
+t_max: 1000000

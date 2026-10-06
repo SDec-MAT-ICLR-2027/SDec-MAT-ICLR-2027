@@ -1,0 +1,28 @@
+# Aerial Ordering -- the paper configuration (mac/presets.py).
+# env_args are generated from mac.PAPER; keep the two in step.
+env: "gymma"
+common_reward: True
+reward_scalarisation: "sum"
+env_args:
+  key: "aerial-ordering-v0"
+  pretrained_wrapper: null
+  obs_mode: "simple"
+  grid_size: 10
+  time_limit: 100
+  n_workers: 5
+  n_targets: 1
+  k_min: 2
+  k_max: 4
+  comm_radius: 0
+  sense_radius: 0
+  wind_prob: 0.1
+
+# PPO-family baselines (mappo/commnet/tarmac) evaluate by sampling: the
+# soft_policies selector ignores test_greedy. QMIX evaluates greedily.
+test_greedy: True
+test_nepisode: 20
+test_interval: 50000
+log_interval: 50000
+runner_log_interval: 20000
+learner_log_interval: 20000
+t_max: 1000000

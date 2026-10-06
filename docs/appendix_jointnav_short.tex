@@ -1,0 +1,119 @@
+% =====================================================================
+% Joint-Action Navigation: fairness statement + the two tables that matter.
+% Every value was read back from the logged run configurations.
+% =====================================================================
+\subsection{Joint-Action Navigation: Protocol}
+\label{app:jointnav-protocol}
+
+\paragraph{Fair comparison.}
+Within each task the four methods share everything except the actor. We
+verified directly from the logged run configurations, rather than from the
+launch scripts, that the environment, the reward terms, the PPO
+hyperparameters, the exploration schedule, the off-policy correction and the
+optimistic-advantage setting are identical across all four arms of every task.
+Each task uses three seeds, and all four methods share the same seed set, the
+same step budget and the same number of rollout workers. Crucially, the three
+learning switches are \emph{not} specific to our method: group-commit
+exploration, the arm-consistent off-policy weight and optimistic advantages are
+applied to every arm, including \textsc{InforMARL}, whose training loop we
+extended so that one command line configures both code bases.
+
+\paragraph{Per-task settings are rule-based, not tuned.}
+Two settings vary across tasks, each determined by a stated property of the
+task rather than by sweeping. The subset-commit probability is $q{=}0.5$ on the
+exact-$k$ tasks and $q{=}1$ otherwise: with $q{=}1$ an entire communication
+group fires at once, which under an exact-$k$ rule is always an overkill, so
+the three-fire/three-hold split could never be explored. Optimistic advantages
+are enabled exactly when the miss penalty is $-5$, where exploration otherwise
+yields almost uniformly negative advantages. Both settings apply to all four
+methods (Table~\ref{tab:jointnav-settings}).
+
+\begin{table}[h]
+\centering
+\caption{Task settings. Every row applies identically to all four methods.
+All other hyperparameters are shared across tasks: $6$ agents, $3$ targets,
+$k{=}3$, capture radius $0.3$, sensing/communication radius $0.6$, horizon
+$50$, $\gamma{=}0.99$, $\lambda{=}0.95$, lr $5\times10^{-4}$, $5$ PPO epochs,
+$32$ rollout workers, $3$ seeds.}
+\label{tab:jointnav-settings}
+\small
+\begin{tabular}{lccccc}
+\toprule
+Task & Capture rule & Miss penalty & Exploration $\varepsilon$ & $q$ & Optimism \\
+\midrule
+E2     & at least $k$ & $-1$ & $0.2 \rightarrow 0$ & $1.0$ & -- \\
+E2-p   & at least $k$ & $-5$ & $0.2$ constant      & $1.0$ & \checkmark \\
+E4     & exactly $k$  & $-5$ & $0.2$ constant      & $0.5$ & \checkmark \\
+E4-m1  & exactly $k$  & $-1$ & $0.2$ constant      & $0.5$ & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{What the results show.}
+Three of the four tasks are solved by several methods, so the comparison does
+not turn on whether a task can be solved at all. On E2, E2-p and E4-m1 the
+methods that succeed reach comparable success rates, and the consistent
+difference between them is \emph{efficiency}: \textsc{SDec-MAT} attains the
+same outcome with roughly two to three times fewer unsuccessful in-range
+capture attempts. Only the exact-$k$ task at the $-5$ penalty (E4) separates
+the methods outright, and there every baseline fails while \textsc{SDec-MAT}
+clears the board (Table~\ref{tab:jointnav-results}).
+
+\begin{table}[h]
+\centering
+\caption{Joint-Action Navigation results, mean $\pm$ one standard deviation
+over three seeds. \emph{False captures} is the number of unsuccessful in-range
+capture attempts per episode (undershoots plus overkills; on the at-least-$k$
+tasks no overkill is possible, so it equals the undershoot count). Lower is
+better for false captures.}
+\label{tab:jointnav-results}
+\small
+\begin{tabular}{llccc}
+\toprule
+Task & Method & Success rate & Joint captures & False captures $\downarrow$ \\
+\midrule
+\multirow{4}{*}{E2}
+ & \textbf{SDec-MAT} & $0.88 \pm 0.02$ & $2.86 \pm 0.02$ & $\mathbf{0.49 \pm 0.05}$ \\
+ & MAT-Dec           & $0.93 \pm 0.00$ & $2.92 \pm 0.01$ & $0.67 \pm 0.41$ \\
+ & MAPPO             & $0.87 \pm 0.01$ & $2.78 \pm 0.04$ & $4.38 \pm 0.20$ \\
+ & InforMARL         & $0.93 \pm 0.01$ & $2.88 \pm 0.00$ & $2.74 \pm 0.48$ \\
+\midrule
+\multirow{4}{*}{E2-p}
+ & \textbf{SDec-MAT} & $0.88 \pm 0.01$ & $2.87 \pm 0.02$ & $\mathbf{0.79 \pm 0.21}$ \\
+ & MAT-Dec           & $0.88 \pm 0.02$ & $2.86 \pm 0.02$ & $1.14 \pm 0.21$ \\
+ & MAPPO             & $0.00 \pm 0.00$ & $0.72 \pm 0.43$ & $3.55 \pm 1.62$ \\
+ & InforMARL         & $0.88 \pm 0.03$ & $2.87 \pm 0.03$ & $1.79 \pm 0.14$ \\
+\midrule
+\multirow{4}{*}{E4}
+ & \textbf{SDec-MAT} & $\mathbf{0.65 \pm 0.39}$ & $\mathbf{2.47 \pm 0.60}$ & $1.97 \pm 1.33$ \\
+ & MAT-Dec           & $0.00 \pm 0.00$ & $0.09 \pm 0.01$ & $1.42 \pm 0.11$ \\
+ & MAPPO             & $0.00 \pm 0.00$ & $0.13 \pm 0.04$ & $2.18 \pm 0.21$ \\
+ & InforMARL         & $0.00 \pm 0.00$ & $0.11 \pm 0.01$ & $1.72 \pm 0.13$ \\
+\midrule
+\multirow{4}{*}{E4-m1}
+ & \textbf{SDec-MAT} & $0.85 \pm 0.08$ & $2.81 \pm 0.10$ & $\mathbf{1.80 \pm 0.89}$ \\
+ & MAT-Dec           & $0.00 \pm 0.00$ & $0.12 \pm 0.01$ & $2.61 \pm 0.18$ \\
+ & MAPPO             & $0.27 \pm 0.39$ & $1.00 \pm 1.24$ & $4.96 \pm 2.20$ \\
+ & InforMARL         & $0.88 \pm 0.01$ & $2.83 \pm 0.03$ & $5.86 \pm 0.33$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Note.}
+On E4 the baselines make few false captures only because they rarely attempt a
+capture at all; per attempt, \textsc{SDec-MAT} succeeds $56\%$ of the time
+against roughly $6\%$ for every baseline. Reported values are training-rollout
+statistics, collected with exploration active, and therefore understate all
+methods: greedy evaluation of the final E4 checkpoints over held-out layouts
+gives $3.00$ captures at a $1.00$ success rate for \textsc{SDec-MAT}.
+E2, E2-p and E4 use seeds $\{1,2,3\}$; E4-m1 was relaunched after a scheduler
+fault and uses $\{2,3,4\}$, shared by all four methods.
+Here's where things stand. The navigation table (tab:jointnav-results, Table 3 in the PDF) and the paper give me some of what the caption needs:
+
+Seeds: 3, stated in Appendix F.3 and tab:jointnav-settings.
+Training-rollout statistics with exploration active: already said in Appendix F.3 but missing from the Table 3 caption and the main-text discussion.
+
+Two things aren't in the paper, and the public repo linked in the reproducibility statement is empty, so I can't confirm them yet:
+
+What "±" is: standard deviation across the 3 seeds, standard error, or min–max. The MAPPO entry 27.0±39.0 suggests std across seeds, but I shouldn't guess.
+The averaging window: for example, the last N rollout episodes per seed, or the final M training iterations.

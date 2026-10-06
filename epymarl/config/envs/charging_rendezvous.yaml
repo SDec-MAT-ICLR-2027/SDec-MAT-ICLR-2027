@@ -1,0 +1,33 @@
+# Charging Rendezvous -- the paper configuration (mac/presets.py).
+# env_args are generated from mac.PAPER; keep the two in step.
+env: "gymma"
+common_reward: True
+reward_scalarisation: "sum"
+env_args:
+  key: "charging-rendezvous-v0"
+  pretrained_wrapper: null
+  n_agents: 6
+  grid_size: 10
+  capacity: 2
+  cohort_sizes: [3, 3]
+  cohort_distances: [3, 6]
+  init_battery: [0.1, 0.15]
+  battery_sigma: 0.0
+  target_level: 0.8
+  drain_rate: 0.02
+  charge_rate: 0.2
+  comm_radius: 1
+  dock_radius: 0
+  shaping_weight: 0.1
+  wind_prob: 0.0
+  time_limit: 100
+
+# PPO-family baselines (mappo/commnet/tarmac) evaluate by sampling: the
+# soft_policies selector ignores test_greedy. QMIX evaluates greedily.
+test_greedy: True
+test_nepisode: 20
+test_interval: 50000
+log_interval: 50000
+runner_log_interval: 10000
+learner_log_interval: 10000
+t_max: 2000000

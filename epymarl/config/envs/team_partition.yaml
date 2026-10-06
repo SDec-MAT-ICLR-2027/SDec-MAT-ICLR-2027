@@ -1,0 +1,52 @@
+# Team Partition -- the paper configuration (mac/presets.py).
+# env_args are generated from mac.PAPER; keep the two in step.
+env: "gymma"
+common_reward: True
+reward_scalarisation: "sum"
+env_args:
+  key: "team-partition-v0"
+  pretrained_wrapper: null
+  n_agents: 9
+  n_zones: 3
+  grid_w: 9
+  grid_h: 6
+  time_limit: 20
+  n_spare: 3
+  k_min: 1
+  allow_zero_quota: False
+  fixed_quota: null
+  n_quota_readers: null
+  spawn_distance: 2
+  wave_gap: 3
+  near_wave_size: 6
+  comm_radius: 2
+  commit_gate: True
+  commit_quorum: null
+  commit_window: 1
+  gate_deadline: null
+  public_regrouped: False
+  expose_own_wave: False
+  all_reward: 10.0
+  zone_reward: 10.0
+  wrong_penalty: 20.0
+  miss_penalty: 25.0
+  dodge_penalty: 0.2
+  step_cost: 0.1
+  step_cost_far: 5.0
+  lambda_coef: 0.0
+  fixed_distances: null
+  shaping_weight: 1.0
+  interference_prob: 0.0
+  transit_interference_prob: 0.0
+  drift_at_staging: False
+  symmetry_assert: True
+
+# PPO-family baselines (mappo/commnet/tarmac) evaluate by sampling: the
+# soft_policies selector ignores test_greedy. QMIX evaluates greedily.
+test_greedy: True
+test_nepisode: 400
+test_interval: 20000
+log_interval: 20000
+runner_log_interval: 10000
+learner_log_interval: 10000
+t_max: 1000000
